@@ -1,7 +1,22 @@
 {
-    "exclude": ["node_modules"],
     "compilerOptions": {
-        "module": "NodeNext",
-        "moduleResolution": "NodeNext"
-    }
-}
+      "target": "es5",
+      "module": "commonjs",
+      "strict": true,
+      "baseUrl": ".",
+      "paths": {
+        "*": ["node_modules/*"]
+      },
+      "lib": [
+        "es2015",
+        "dom"
+      ]
+    },
+    "include": [
+      "assembly/**/*.ts"
+    ],
+    "exclude": [
+      "node_modules"
+    ]
+  }
+  
