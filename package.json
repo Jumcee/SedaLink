@@ -22,6 +22,8 @@
   },
   "dependencies": {
     "@seda-protocol/as-sdk": "^0.0.15",
-    "@seda-protocol/vm": "^0.0.4"
+    "@seda-protocol/vm": "^0.0.4",
+    "json-as": "^0.9.21",
+    "visitor-as": "^0.11.4"
   }
 }
