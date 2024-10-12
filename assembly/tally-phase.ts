@@ -1,23 +1,30 @@
-import { Process, Tally } from "@seda-protocol/as-sdk/assembly";
+import { Process, Tally, Bytes, Console } from "@seda-protocol/as-sdk/assembly";
 
 export function tallyPhase(): void {
   const reveals = Tally.getReveals();
-  const combinedResults: string[] = [];
+  const validResults: i64[] = [];
 
   for (let i = 0; i < reveals.length; i++) {
-    combinedResults.push(reveals[i].reveal.toUtf8String());
+    if (reveals[i].inConsensus) {
+      validResults.push(reveals[i].reveal.toI64());
+    }
   }
 
-  if (combinedResults.length > 0) {
-    // Aggregate the results to make a decision (e.g., insurance payout)
-    const finalResult = aggregateResults(combinedResults);
-    Process.success(Bytes.fromUtf8String(finalResult));
+  if (validResults.length > 0) {
+    // Use median for aggregation
+    validResults.sort((a, b) => a - b);
+    const medianIndex = validResults.length / 2;
+    const finalResult = validResults[medianIndex];
+    
+    Console.log(`Final result: ${finalResult.toString()}`);
+    
+    // Convert i64 to string and then to Bytes
+    const resultString = finalResult.toString();
+    const resultBytes = Bytes.fromUtf8String(resultString);
+    
+    Process.success(resultBytes);
   } else {
+    Console.log("No consensus reached");
     Process.error(Bytes.fromUtf8String("No consensus reached"));
   }
-}
-
-function aggregateResults(results: string[]): string {
-  // Example: use median or other logic to calculate payouts
-  return `Final Insurance Decision based on ${results}`;
 }
