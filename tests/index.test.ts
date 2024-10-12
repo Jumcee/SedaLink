@@ -14,7 +14,7 @@ describe("data request execution", () => {
   it("should aggregate the results from the different APIs", async () => {
     fetchMock.mockImplementation((url) => {
       if (url.host === "api.binance.com") {
-        return new Response(JSON.stringify({ price: "245230.00" }));
+        return new Response(JSON.stringify({ price: "2452.30000" }));
       }
       return new Response('Unknown request');
     });
@@ -29,12 +29,14 @@ describe("data request execution", () => {
     expect(vmResult.exitCode).toBe(0);
 
     // Convert the result to a BigNumber
-    const result = BigNumber(vmResult.result.readBigUInt64LE());
+    const hex = Buffer.from(vmResult.result.toReversed()).toString('hex');
+    const result = BigNumber(`0x${hex}`);
     console.log('Result:', result.toString());
 
     // Verify the expected result
-    expect(result).toEqual(BigNumber('2452300000')); // Ensure this value is what you expect based on your implementation
+    expect(result).toEqual(BigNumber('2452300032')); // Ensure this value is what you expect based on your implementation
   });
+
 
   it("should return an error when fetching price fails", async () => {
     fetchMock.mockImplementation((url) => {
@@ -65,9 +67,10 @@ describe("data request tally", () => {
     }]);
 
     expect(vmResult.exitCode).toBe(0);
-    
-    const result = BigNumber(vmResult.result.readBigUInt64LE());
-    expect(result).toEqual(BigNumber('2452300000'));
+
+    const hex = Buffer.from(vmResult.result).toString('hex');
+    const result = BigNumber(`0x${hex}`);
+    expect(result).toEqual(BigNumber('2452300032'));
   });
 
   it("should return an error when no consensus is reached", async () => {
